@@ -6,7 +6,7 @@ import paho.mqtt.client
 import json
 
 def on_connect(client, userdata, flags, rc):    
-    print('Conectado (%s)' %client._client_id)
+    print('Conectado (%s)' % client._client_id)
     client.subscribe(topic='Sambil/#', qos = 0) 
 
 def on_message_C(client,userdata,message): 
