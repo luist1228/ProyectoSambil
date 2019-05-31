@@ -12,7 +12,7 @@ def on_connect():
     print("Pub connected!")
 
 def main():
-    client = mqtt.Client("EntrancePub", False)
+    client = mqtt.Client("TablePub", False)
     client.qos = 0
     client.connect(host="localhost")
 
