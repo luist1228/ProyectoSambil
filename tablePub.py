@@ -33,22 +33,22 @@ def main():
 
             if(int(np.random.uniform(0,2)) == 1 and len(sitPeople) > 0):
                 ran = int(np.random.uniform(0, len(sitPeople)))
-
-                macAddress = [sitPeople[ran][0], sitPeople[ran][1]]
-                sitPeople.remove(macAddress)
-                macAddressList.append(macAddress)
+                
+                tableUser = [sitPeople[ran][0], sitPeople[ran][1]]
+                sitPeople.remove(tableUser)
+                macAddressList.append(tableUser)
                 topic = "Parado"
             else:
                 ran = int(np.random.uniform(0, len(macAddressList)))
-                macAddress = [macAddressList[ran], tableID]
-                macAddressList.remove(macAddress[0])
+                tableUser = [macAddressList[ran], tableID]
+                macAddressList.remove(tableUser[0])
 
-                sitPeople.append(macAddress)
+                sitPeople.append(tableUser)
                 topic = "Sentado"
 
             payload = {
-                "tableID": str(macAddress[1]),
-                "macAddress": str(macAddress[0]),
+                "tableID": str(tableUser[1]),
+                "macAddress": str(tableUser[0]),
                 "time": str(currentTime)
             }
 
@@ -65,16 +65,16 @@ def queryMacAddressStandUp():
     macAddressList = []
     macAddressCounter = 0
     while(macAddressCounter < 60):
-        macAddress = ""
+        tableUser = ""
         counter = 0
         while(counter < 12):
             if(counter%2 != 1 and counter > 0):
-                macAddress += ":"
+                tableUser += ":"
 
-            macAddress += str(random.choice('0123456789ABCDEF'))
+            tableUser += str(random.choice('0123456789ABCDEF'))
             counter += 1
 
-        macAddressList.append(macAddress)
+        macAddressList.append(tableUser)
         macAddressCounter += 1
 
     return macAddressList
@@ -83,16 +83,16 @@ def querySitPeople():
     macAddressList = []
     macAddressCounter = 0
     while(macAddressCounter < 0):
-        macAddress = ""
+        tableUser = ""
         counter = 0
         while(counter < 12):
             if(counter%2 != 1 and counter > 0):
-                macAddress += ":"
+                tableUser += ":"
 
-            macAddress += str(random.choice('0123456789ABCDEF'))
+            tableUser += str(random.choice('0123456789ABCDEF'))
             counter += 1
 
-        macAddressList.append(macAddress)
+        macAddressList.append(tableUser)
         macAddressCounter += 1
 
     return macAddressList
