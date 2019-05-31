@@ -7,6 +7,17 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish
 import numpy as np
 import datetime
+import psycopg2 as psy
+import pandas as pd
+
+conn=psy.connect(host = 'localhost', user= 'postgres', password ='12t09lma', dbname= 'SambilDB')
+
+def contarCamaras():
+  #Numero de personas
+  sql='''SELECT * FROM public."camara";'''
+  df = pd.read_sql_query(sql, conn)
+  camaras = df.id.count()
+  return camaras
 
 def on_connect():
     print("Pub connected!")
@@ -16,7 +27,7 @@ def main():
     client.qos = 0
     client.connect(host="localhost")
 
-    mallAccess = 3 #Number of mall access
+    mallAccess =contarCamaras()  #Number of mall access
     currentTime = datetime.datetime.now()
 
     macAddress = ""
@@ -27,7 +38,7 @@ def main():
     entries = np.random.normal(avgEntries, stdEntries)
 
     while(entries):
-        accessID = int(np.random.uniform(0 , mallAccess))
+        accessID = int(np.random.uniform(1 , mallAccess+1))
 
         if((int(np.random.uniform(0,3)) != 1) or (len(macAddressList) == 0)):
             gender = int(np.random.uniform(0,2))
@@ -56,7 +67,7 @@ def main():
 
             macAddressList.append(macAddress)
 
-            client.publish("sambil/camaras/entrada", json.dumps(payload), qos=0)
+            client.publish("Sambil/Camaras/Entrada", json.dumps(payload), qos=0)
 
         else:
             macAddress = macAddressList[int(np.random.uniform(0, len(macAddressList)))]
@@ -68,7 +79,7 @@ def main():
                 "time": str(currentTime)
             }
 
-            client.publish("sambil/camaras/salida", json.dumps(payload), qos=0)
+            client.publish("Sambil/Camaras/Salida", json.dumps(payload), qos=0)
 
         currentTime = currentTime + datetime.timedelta(hours=1)
 
