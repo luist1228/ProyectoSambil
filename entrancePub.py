@@ -14,10 +14,42 @@ conn=psy.connect(host = 'localhost', user= 'postgres', password ='12t09lma', dbn
 
 def contarCamaras():
   #Numero de personas
-  sql='''SELECT * FROM public."camara";'''
+  sql='''SELECT *  
+  FROM public."camara";'''
   df = pd.read_sql_query(sql, conn)
   camaras = df.id.count()
   return camaras
+
+def listaAdentro():
+    sql='''select e."macadd" from entradap as e
+    left join salidap as s on s."macadd"=e."macadd" 
+    where s."id" IS NULL and e."macadd" is not null'''
+    df = pd.read_sql_query(sql, conn)
+
+    sql='''select *from salidap as e
+    where "macadd" is null'''
+    df2 = pd.read_sql_query(sql, conn)
+
+    sql='''select *from entradap as e
+    where "macadd" is null'''
+    df3 = pd.read_sql_query(sql, conn)
+
+    entro=len(df2["id"])
+    salio=len(df3["id"])
+    adentro=salio-entro
+    
+
+    print(adentro)
+    
+    Lista = []
+    for index, row in df.iterrows():
+        Lista.append(row["macadd"])
+    
+    while adentro > 0 :
+        Lista.append("null")
+        adentro -= 1
+
+    return Lista
 
 def on_connect():
     print("Pub connected!")
@@ -29,10 +61,11 @@ def main():
 
     mallAccess =contarCamaras()  #Number of mall access
     currentTime = datetime.datetime.now()
-
+    listaAdentro()
+    time.sleep(5)
     macAddress = ""
-    macAddressList = []
-
+    macAddressList = listaAdentro()
+    print(macAddressList)
     avgEntries = 500
     stdEntries = 50
     entries = np.random.normal(avgEntries, stdEntries)
