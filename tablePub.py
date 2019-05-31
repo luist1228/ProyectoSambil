@@ -16,41 +16,43 @@ def main():
     client.qos = 0
     client.connect(host="localhost")
 
-    #tables = queryNumTables()
-    #macAddressList = queryMacAddressStandUp()
-    #sitPeople = querySitPeople()
+    tables = queryNumTables()
+    macAddressList = queryMacAddressStandUp()
+    sitPeople = querySitPeople()
 
     currentTime = datetime.datetime.now()
 
     while(True):
-        tables = queryNumTables()
-        macAddressList = queryMacAddressStandUp()
-        sitPeople = querySitPeople()
+        #tables = queryNumTables()
+        #macAddressList = queryMacAddressStandUp()
+        #sitPeople = querySitPeople()
 
         if(len(macAddressList) > 0):
-            macAddress = macAddressList[int(np.random.uniform(0, len(macAddressList)))]
-            macAddressList.remove(macAddress)
-
-            tableID = int(np.random.uniform(0, tables))
+            tableID = int(np.random.uniform(0, tables)) + 1
             topic = ""
 
-            if(int(np.random.uniform(0,2)) == 1 and len(sitPeople)):
-                macAddress = sitPeople[int(np.random.uniform(0, len(sitPeople)))]
+            if(int(np.random.uniform(0,2)) == 1 and len(sitPeople) > 0):
+                ran = int(np.random.uniform(0, len(sitPeople)))
+
+                macAddress = [sitPeople[ran][0], sitPeople[ran][1]]
                 sitPeople.remove(macAddress)
                 macAddressList.append(macAddress)
                 topic = "Parado"
             else:
-                macAddress = macAddressList[int(np.random.uniform(0, len(macAddressList)))]
-                macAddressList.remove(macAddress)
+                ran = int(np.random.uniform(0, len(macAddressList)))
+                macAddress = [macAddressList[ran], tableID]
+                macAddressList.remove(macAddress[0])
+
                 sitPeople.append(macAddress)
                 topic = "Sentado"
 
             payload = {
-                "tableID": str(tableID),
-                "macAddress": str(macAddress),
+                "tableID": str(macAddress[1]),
+                "macAddress": str(macAddress[0]),
                 "time": str(currentTime)
             }
 
+            print(topic)
             print(payload)
             currentTime = currentTime + datetime.timedelta(hours=1)
 
