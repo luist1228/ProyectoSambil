@@ -48,7 +48,7 @@ create table SalidaP(
 	id serial primary key,
 	fkCamara int references Camara(id),
 	registroS timestamp,
-	macAdd int references EntradaP(id)
+	macAdd varchar(20)
 );
 
 
@@ -75,13 +75,5 @@ create table RegistroB(
 	tiempoI timestamp,
 	tiempoF timestamp
 );
-
-
-
-select count("id") from entradap as e
-where date_part('day',e."registroe")=date_part('day',now())
-
-select count("id") from salidap as e
-where date_part('day',e."registros")=date_part('day',now())
 
 

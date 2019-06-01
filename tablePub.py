@@ -7,6 +7,10 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish
 import numpy as np
 import datetime
+import psycopg2 as psy
+import pandas as pd
+
+conn=psy.connect(host = 'localhost', user= 'postgres', password ='12t09lma', dbname= 'SambilDB')
 
 def on_connect():
     print("Pub connected!")
@@ -17,6 +21,7 @@ def main():
     client.connect(host="localhost")
 
     tables = queryNumTables()
+    idMesas()
     macAddressList = queryMacAddressStandUp()
     sitPeople = querySitPeople()
 
@@ -62,43 +67,54 @@ def main():
 
 
 def queryMacAddressStandUp():
-    macAddressList = []
-    macAddressCounter = 0
-    while(macAddressCounter < 60):
-        tableUser = ""
-        counter = 0
-        while(counter < 12):
-            if(counter%2 != 1 and counter > 0):
-                tableUser += ":"
+    sql='''select e."macadd" from entradap as e
+    left join salidap as s on s."macadd"=e."macadd" 
+    where s."id" IS NULL and e."macadd" is not null'''
+    df = pd.read_sql_query(sql, conn)
 
-            tableUser += str(random.choice('0123456789ABCDEF'))
-            counter += 1
+    sql='''select *from salidap as e
+    where "macadd" is null'''
+    df2 = pd.read_sql_query(sql, conn)
 
-        macAddressList.append(tableUser)
-        macAddressCounter += 1
+    sql='''select *from entradap as e
+    where "macadd" is null'''
+    df3 = pd.read_sql_query(sql, conn)
 
-    return macAddressList
+    entro=len(df2["id"])
+    salio=len(df3["id"])
+    adentro=salio-entro
+    
+    Lista = []
+    for index, row in df.iterrows():
+        Lista.append(row["macadd"])
+    
+    while adentro > 0 :
+        Lista.append("null")
+        adentro -= 1
+
+    return Lista
 
 def querySitPeople():
     macAddressList = []
-    macAddressCounter = 0
-    while(macAddressCounter < 0):
-        tableUser = ""
-        counter = 0
-        while(counter < 12):
-            if(counter%2 != 1 and counter > 0):
-                tableUser += ":"
-
-            tableUser += str(random.choice('0123456789ABCDEF'))
-            counter += 1
-
-        macAddressList.append(tableUser)
-        macAddressCounter += 1
-
+    
     return macAddressList
 
 def queryNumTables():
-    return 10
+    sql='''SELECT *  
+    FROM public."mesa";'''
+    df = pd.read_sql_query(sql, conn)
+    mesas = df.id.count()
+    print(mesas)
+    return mesas
+
+def idMesas():
+    mesaslista=[]
+    sql='''select b."id" from beacon as b
+    inner join tienda as s on b."id"= s."fkbeacon";'''
+    df = pd.read_sql_query(sql, conn)
+    for index, row in df.iterrows():
+        mesaslista.append(row["id"])
+    print(mesaslista)
 
 if __name__ == "__main__":
     main()
