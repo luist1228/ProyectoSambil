@@ -61,6 +61,9 @@ inner join tienda as t on t."fkbeacon"=b."id"
 select b."id" from beacon as b
 inner join mesa as t on t."fkbeacon"=b."id"
 
+select e."fecha" as entrada, s."fecha" as salida 
+from registrom as e , registrom as s
+
 
 
 

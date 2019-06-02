@@ -59,9 +59,57 @@ EXECUTE PROCEDURE CompraconMac();
 
 ------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION RegistroDatosPersona()
+RETURNS TRIGGER AS $$
+declare
+n varchar(20);
+BEGIN
+	if new.fkpersonamac is not null then
+	
+		select p."cedula" into n
+		from persona as p
+		where new.fkpersonamac=p."macaddres";
+		
+		if n is null then
+		
+		UPDATE public.persona
+		SET  nombre=new.nombre, cedula=new.cedula, apellido=new.apellido
+		WHERE new.fkpersonamac=persona."macaddres";
+		
+		end if;	
+	end if;
+	return null;
+	
+END
+$$ LANGUAGE plpgSQL;
 
 
+CREATE TRIGGER RegistroDatosPersona
+AFTER INSERT
+ON Compra
+FOR EACH ROW
+EXECUTE PROCEDURE RegistroDatosPersona();
 
+
+------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION RegistroCompraRechazada()
+RETURNS TRIGGER AS $$
+declare
+n varchar(20);
+BEGIN
+	
+	return null;
+	
+END
+$$ LANGUAGE plpgSQL;
+
+
+CREATE TRIGGER RegistroCompraRechazada
+BEFORE INSERT
+ON Compra
+FOR EACH ROW
+EXECUTE PROCEDURE RegistroCompraRechazada();
 
 
 

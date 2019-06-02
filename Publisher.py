@@ -17,6 +17,8 @@ peopleInside = []
 peopleSitting = []
 peopleInStore = []
 
+
+
 def on_connect():
     print("Pub connected!")
 
@@ -30,7 +32,7 @@ def main():
     storeBeaconID = queryStoreBeaconID()
     tableBeaconID = queryTableBeaconID()
     currentTime = datetime.datetime.now().replace(hour=8, minute=0)
-
+  
     days = 31
 
     while(days > 0):
@@ -117,7 +119,6 @@ def main():
         days -= 1
         currentTime = datetime.timedelta(days=1) +  currentTime.replace(hour=8, minute=0)
         print(currentTime,'fin del dia')
-
 
 #Publisher's Methods
 def pubEntrance(client, numAccess, currentTime):
@@ -312,7 +313,7 @@ def pubSales(client, buyer, currentTime):
             name = buyer[0][4]
             lastname = buyer[0][5]
 
-        #Case for random ID (trigger asqueroso de Nicolas)
+        #Case for random ID
         if(np.random.uniform(0,5) == 0):
             randomPerson = random.choice(knownPeople)
             counter = 0
@@ -322,6 +323,7 @@ def pubSales(client, buyer, currentTime):
                     inside = True
             if(len(randomPerson) > 3 and (not inside)):
                 personID = randomPerson[3]
+                
 
         payload = {
             "beaconID": str(buyer[1]),
