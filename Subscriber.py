@@ -21,30 +21,30 @@ def on_message_C(client,userdata,message):
             print(c)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
-            sql = '''INSERT INTO public."entradap" (fkcamara, sexo, edad, macadd, registroe)VALUES ( %s, %s, %s, %s, %s);'''
-            cur.execute(sql, (c["camaraID"],c["gender"], c["age"],c["macAddress"],c["time"]))
+            sql = '''INSERT INTO public."entradacc" (fkcamara, sexo, edad, macadd, registroe)VALUES ( %s, %s, %s, %s, %s);'''
+            cur.execute(sql, (c["cameraID"],c["gender"], c["age"],c["macAddress"],c["time"]))
             conn.commit()
         else:
             print(c)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
-            sql = '''INSERT INTO public."entradap" (fkcamara, sexo, edad, registroe)VALUES ( %s, %s, %s, %s);'''
-            cur.execute(sql, (c["camaraID"],c["gender"], c["age"],c["time"]))
+            sql = '''INSERT INTO public."entradacc" (fkcamara, sexo, edad, registroe)VALUES ( %s, %s, %s, %s);'''
+            cur.execute(sql, (c["cameraID"],c["gender"], c["age"],c["time"]))
             conn.commit()
     else:
         if (c["macAddress"]!="null"):
             print(c)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
-            sql = '''INSERT INTO public."salidap"(fkcamara, registros, macadd)VALUES (%s, %s, %s);'''
-            cur.execute(sql, (c["camaraID"],c["time"],c["macAddress"]))
+            sql = '''INSERT INTO public."salidacc"(fkcamara, registros, macadd)VALUES (%s, %s, %s);'''
+            cur.execute(sql, (c["cameraID"],c["time"],c["macAddress"]))
             conn.commit()
         else:
             print(c)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
-            sql = '''INSERT INTO public."salidap"(fkcamara, registros)VALUES (%s, %s);'''
-            cur.execute(sql, (c["camaraID"],c["time"]))
+            sql = '''INSERT INTO public."salidacc"(fkcamara, registros)VALUES (%s, %s);'''
+            cur.execute(sql, (c["cameraID"],c["time"]))
             conn.commit()
 
 
@@ -53,19 +53,19 @@ def on_message_M(client,userdata,message):
     m = json.loads(message.payload)
     print('------------------------------')
     if (message.topic=="Sambil/Mesa/Parado") :
-       if (m["macAddress"]!="null"):
+        if (m["macAddress"]!="null"):
             print(m)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
             sql = '''INSERT INTO public.registrom( mac, fkmesa, fecha, io)VALUES ( %s, %s, %s, %s);'''
-            cur.execute(sql, (m["macAddress"],m["tableID"], m["time"], False))
+            cur.execute(sql, (m["macAddress"],m["beaconID"], m["time"], False))
             conn.commit()
         else:
             print(m)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
             sql = '''INSERT INTO public.registrom(fkmesa, fecha, io)VALUES ( %s, %s, %s);'''
-            cur.execute(sql, (m["tableID"], m["time"],False))
+            cur.execute(sql, (m["beaconID"], m["time"],False))
             conn.commit()
     else:
         if (m["macAddress"]!="null"):
@@ -73,14 +73,14 @@ def on_message_M(client,userdata,message):
             print('topic: %s' % message.topic)
             cur = conn.cursor()
             sql = '''INSERT INTO public.registrom( mac, fkmesa, fecha, io)VALUES ( %s, %s, %s, %s);'''
-            cur.execute(sql, (m["macAddress"],m["tableID"], m["time"], True))
+            cur.execute(sql, (m["macAddress"],m["beaconID"], m["time"], True))
             conn.commit()
         else:
             print(m)
             print('topic: %s' % message.topic)
             cur = conn.cursor()
             sql = '''INSERT INTO public.registrom(fkmesa, fecha, io)VALUES ( %s, %s, %s);'''
-            cur.execute(sql, (m["tableID"], m["time"],True))
+            cur.execute(sql, (m["beaconID"], m["time"],True))
             conn.commit()
 
    
@@ -102,7 +102,7 @@ def on_message_T(client,userdata,message):
             sql = '''INSERT INTO public.registrot(fkbeacon, fecha, io)VALUES ( %s, %s, %s);'''
             cur.execute(sql, (t["beaconID"], t["time"], True))
             conn.commit()
-    else if (message.topic=="Sambil/Tienda/Saliendo") :
+    if (message.topic=="Sambil/Tienda/Saliendo") :
         if (t["macAddress"]!="null"):
             print(t)
             print('topic: %s' % message.topic)
@@ -117,8 +117,8 @@ def on_message_T(client,userdata,message):
             sql = '''INSERT INTO public.registrot(fkbeacon, fecha, io)VALUES ( %s, %s, %s);'''
             cur.execute(sql, (t["beaconID"], t["time"], False))
             conn.commit()
-    else:
-         if (t["macAddress"]!="null"):
+    if (message.topic=="Sambil/Tienda/Compra") :
+        if (t["macAddress"]!="null"):
             print(t)
             print('topic: %s' % message.topic)
             cur = conn.cursor()

@@ -44,6 +44,7 @@ def main():
                 currentTime = currentTime + datetime.timedelta(minutes=1)
 
             currentTime = currentTime + datetime.timedelta(minutes=6)
+            time.sleep(0.01)
 
 
         print("\nStart Closing the C.C.")
@@ -56,8 +57,8 @@ def main():
                 peopleInside.remove(macAddress)
 
                 payload = {
-                    "camaraID": str(cameraID),
-                    "macAddress": str(macAddress),
+                    "cameraID": str(cameraID),
+                    "macAddress": str(macAddress[0]),
                     "time": str(currentTime)
                 }
                 
@@ -73,7 +74,7 @@ def main():
                 peopleInside.append(tableUser[0])
 
                 payload = {
-                    "tableID": str(tableUser[1]),
+                    "beaconID": str(tableUser[1]),
                     "macAddress": str(tableUser[0][0]),
                     "time": str(currentTime)
                 }
@@ -197,8 +198,8 @@ def pubEntrance(client, numAccess, currentTime):
         peopleInside.remove(macAddress)
 
         payload = {
-            "camaraID": str(cameraID),
-            "macAddress": str(macAddress),
+            "cameraID": str(cameraID),
+            "macAddress": str(macAddress[0]),
             "time": str(currentTime)
         }
         topic = "Salida"
@@ -261,7 +262,7 @@ def pubTables(client, tableBeaconID, currentTime):
             topic = "Sentado"
 
         payload = {
-            "tableID": str(tableUser[1]),
+            "beaconID": str(tableUser[1]),
             "macAddress": str(tableUser[0][0]),
             "time": str(currentTime)
         }
@@ -375,10 +376,12 @@ def queryNumAccess():
     return 3
 
 def queryStoreBeaconID():
-    return [2,4,6,8,10,12,14,16]
+    return [1,3,5]
 
 def queryTableBeaconID():
-    return [1,3,5,7,9,11,13,15]
+    return [2,4,6]
 
 
 if __name__ == "__main__":
+    main()
+
