@@ -118,6 +118,20 @@ def on_message_T(client,userdata,message):
             cur.execute(sql, (t["beaconID"], t["time"], False))
             conn.commit()
     else:
+         if (t["macAddress"]!="null"):
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.compra(fktienda, fkpersonamac, fecha, cedula, nombre, apellido, total)VALUES ( %s, %s, %s, %s, %s, %s, %s);'''
+            cur.execute(sql, (t["beaconID"],t["macAddress"], t["time"],t["personID"],t["name"],t["lastname"],t["price"]))
+            conn.commit()
+        else:
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.compra(fktienda, fecha, cedula, nombre, apellido, total)VALUES ( %s, %s, %s, %s, %s, %s);'''
+            cur.execute(sql, (t["beaconID"],t["time"],t["personID"],t["name"],t["lastname"],t["price"]))
+            conn.commit()
 
 
 
