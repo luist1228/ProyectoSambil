@@ -61,10 +61,14 @@ inner join tienda as t on t."fkbeacon"=b."id"
 select b."id" from beacon as b
 inner join mesa as t on t."fkbeacon"=b."id"
 
-select e."fecha" as entrada, s."fecha" as salida 
-from registrom as e , registrom as s
+select count (e."id") as entrada
+from registrom as e 
+where e."io"=false
 
-
+select count(e."id") as entrada  
+from registrom as e
+left join registrom as s on e."id"=s."id" and  s."fecha">e."fecha" and e."io"!=s."io"
+where e."io"=false
 
 
 
