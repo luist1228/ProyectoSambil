@@ -5,23 +5,22 @@ RETURNS TRIGGER AS $$
 declare
 	n varchar(20);
 BEGIN
-	if new.macaddres is not null then
-	
-		SELECT s."macaddres" into n 
-		from Persona as s
-		where s."macaddres"=new.macadd;
-		
-		if n is null then 
-			INSERT INTO public.persona( macaddres, nombre, apellido,cedula) VALUES (new.macaddres, new.nombre, new.apellido,new.cedula);
-		end if;		
-	end if ;
-	RETURN null;
+		if new.macadd is not null then
+			SELECT s."macaddres" into n 
+			from Persona as s
+			where s."macaddres"=new.macadd;
+			
+			if n is null then
+			INSERT INTO public.persona( macaddres) VALUES (new.macadd);	
+			end if;
+		end if;
+		return new;
 END
 $$ LANGUAGE plpgSQL;
 
 
 CREATE TRIGGER RegistroPersonaT
-AFTER INSERT
+BEFORE INSERT
 ON EntradaCC
 FOR EACH ROW
 EXECUTE PROCEDURE RegistroPersona();

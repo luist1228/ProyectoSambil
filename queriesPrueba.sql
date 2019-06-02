@@ -50,10 +50,18 @@ select * from entradap as e
 where "macadd"='F9:57:A2:9D:AF:B0'
 
 
-
-
+select count(e."macaddres") , e."macaddres" from Persona as e
+group by "macaddres"
 
 
 
 select b."id" from beacon as b
-inner join tienda as s on b."id"= s."fkbeacon"
+inner join tienda as t on t."fkbeacon"=b."id"
+
+select b."id" from beacon as b
+inner join mesa as t on t."fkbeacon"=b."id"
+
+
+
+
+

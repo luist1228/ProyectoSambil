@@ -56,7 +56,7 @@ create table SalidaCC(
 
 create table Persona(
 	id serial primary key,
-	macAddres varchar(20) unique,
+	macAddres varchar(20) UNIQUE,
 	nombre varchar(20),
 	cedula int unique,
 	apellido varchar(20)
@@ -65,11 +65,13 @@ create table Persona(
 
 create table Compra (
 	id serial primary key,
-	fkTienda int references Tienda(id),
+	fkTienda int references Beacon(id),
 	fkPersonaMac varchar(20) references Persona(macaddres),
 	fecha timestamp,
 	cedula int,
-	total int
+	nombre varchar(20),
+	apellido varchar(20),
+	total float(8)
 );
 
 create table RegistroT(
@@ -83,7 +85,7 @@ create table RegistroT(
 create table RegistroM(
 	id serial primary key,
 	mac varchar(20),
-	fkMesa int references Mesa(id),
+	fkMesa int references Beacon(id),
 	fecha timestamp,
 	io boolean 
 );
