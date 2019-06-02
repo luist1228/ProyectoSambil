@@ -34,7 +34,7 @@ create table Camara(
 );
 
 
-create table EntradaP(
+create table EntradaCC(
 	id serial primary key,
 	fkCamara int references Camara(id),
 	sexo varchar(10),
@@ -44,7 +44,7 @@ create table EntradaP(
 );
 
 
-create table SalidaP(
+create table SalidaCC(
 	id serial primary key,
 	fkCamara int references Camara(id),
 	registroS timestamp,
@@ -54,7 +54,7 @@ create table SalidaP(
 
 create table Persona(
 	id serial primary key,
-	macAddres varchar(20),
+	macAddres varchar(20) unique,
 	nombre varchar(20),
 	apellido varchar(20)
 );
@@ -63,17 +63,27 @@ create table Persona(
 create table Compra (
 	id serial primary key,
 	fkTienda int references Tienda(id),
-	fkPersona int references Persona(id),
+	fkPersonaMac varchar(20) references Persona(macaddres),
 	fecha timestamp,
 	total int
 );
 
-
-create table RegistroB(
+create table RegistroT(
 	id serial primary key,
-	macadd int references Persona(id),
-	tiempoI timestamp,
-	tiempoF timestamp
+	mac varchar(20),
+	fkBeacon int references Beacon(id),
+	fecha timestamp,
+	io boolean 
 );
+
+create table RegistroM(
+	id serial primary key,
+	mac varchar(20),
+	fkMesa int references Mesa(id),
+	fecha timestamp,
+	io boolean 
+);
+
+
 
 
