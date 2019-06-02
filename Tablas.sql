@@ -58,6 +58,7 @@ create table Persona(
 	id serial primary key,
 	macAddres varchar(20) unique,
 	nombre varchar(20),
+	cedula int unique,
 	apellido varchar(20)
 );
 
@@ -67,6 +68,7 @@ create table Compra (
 	fkTienda int references Tienda(id),
 	fkPersonaMac varchar(20) references Persona(macaddres),
 	fecha timestamp,
+	cedula int,
 	total int
 );
 
