@@ -1,3 +1,5 @@
+---------------------------------TABLAS---------------------------
+------------------------------------------------------------------
 create table Beacon(
 	id serial primary key,
 	modelo varchar(20)
@@ -84,6 +86,9 @@ create table RegistroM(
 	io boolean 
 );
 
-
-
+create table CompraEntrada (
+	id serial primary key,
+	fkCompra int references Compra(id),
+	fechaEntrada timestamp 
+);
 
