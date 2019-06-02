@@ -8,17 +8,7 @@ import paho.mqtt.publish
 import numpy as np
 import datetime
 
-def getJsonData():
-    with open('database.json') as json_file:  
-        data = json.load(json_file)
-        
-    return data['nombres']
-
-dataPeople = getJsonData()
-
-
 knownPeople = []
-
 peopleInside = []
 peopleSitting = []
 peopleInStore = []
@@ -35,90 +25,93 @@ def main():
     numAccess = queryNumAccess()
     storeBeaconID = queryStoreBeaconID()
     tableBeaconID = queryTableBeaconID()
-
     currentTime = datetime.datetime.now().replace(hour=8, minute=0)
 
-    visits = getNumVisits()
+    days = 31
 
-    while(visits > 0 and currentTime.hour < 22):
-        if(int(np.random.uniform(0,2)) != 0):
-            pubEntrance(client,numAccess,currentTime)
-            currentTime = currentTime + datetime.timedelta(minutes=1)
-            visits -= 1
-        if(int(np.random.uniform(0,3)) == 0):
-            pubStores(client,storeBeaconID,currentTime)
-        if(int(np.random.uniform(0,3)) == 0):
-            pubTables(client,tableBeaconID,currentTime)
-            currentTime = currentTime + datetime.timedelta(minutes=1)
+    while(days > 0):
+        print(currentTime)
+        visits = getNumVisits()
+        while(visits > 0 and currentTime.hour < 22):
+            if(int(np.random.uniform(0,2)) != 0):
+                pubEntrance(client,numAccess,currentTime)
+                currentTime = currentTime + datetime.timedelta(minutes=1)
+                visits -= 1
+            if(int(np.random.uniform(0,3)) == 0):
+                pubStores(client,storeBeaconID,currentTime)
+            if(int(np.random.uniform(0,3)) == 0):
+                pubTables(client,tableBeaconID,currentTime)
+                currentTime = currentTime + datetime.timedelta(minutes=1)
 
-        currentTime = currentTime + datetime.timedelta(minutes=6)
-        time.sleep(0.3)
+            currentTime = currentTime + datetime.timedelta(minutes=6)
 
-    print("\nStart Closing the C.C.")
-    while((len(peopleInside) + len(peopleInStore) + len(peopleSitting)) > 0):
-        ran = np.random.uniform(0, len(peopleInside))
-        while(ran > 0):
-            cameraID = int(np.random.uniform(0 , numAccess)) + 1
-            macAddress = peopleInside[int(np.random.uniform(0, len(peopleInside)))]
-            peopleInside.remove(macAddress)
 
-            payload = {
-                "camaraID": str(cameraID),
-                "macAddress": str(macAddress),
-                "time": str(currentTime)
-            }
-            
-            client.publish("Sambil/Camaras/Salida", json.dumps(payload), qos=0)
-            print("Saliendo  (C.C.)   --> ", end='')
-            print(payload)
-            ran -= 1
+        print("\nStart Closing the C.C.")
+        while((len(peopleInside) + len(peopleInStore) + len(peopleSitting)) > 0):
 
-        ran = np.random.uniform(0, len(peopleSitting))
-        while(ran > 0):
-            tableUser = random.choice(peopleSitting)
-            peopleSitting.remove(tableUser)
-            peopleInside.append(tableUser[0])
+            ran = np.random.uniform(0, len(peopleInside))
+            while(ran > 0):
+                cameraID = int(np.random.uniform(0 , numAccess)) + 1
+                macAddress = peopleInside[int(np.random.uniform(0, len(peopleInside)))]
+                peopleInside.remove(macAddress)
 
-            payload = {
-                "tableID": str(tableUser[1]),
-                "macAddress": str(tableUser[0][0]),
-                "time": str(currentTime)
-            }
+                payload = {
+                    "camaraID": str(cameraID),
+                    "macAddress": str(macAddress),
+                    "time": str(currentTime)
+                }
+                
+                client.publish("Sambil/Camaras/Salida", json.dumps(payload), qos=0)
+                print("Saliendo  (C.C.)   --> ", end='')
+                print(payload)
+                ran -= 1
 
-            client.publish("Sambil/Mesa/Parado", json.dumps(payload), qos=0)
-            print("Parado  (Mesa)   --> ", end='')
-            print(payload)
-            ran -= 1
+            ran = np.random.uniform(0, len(peopleSitting))
+            while(ran > 0):
+                tableUser = random.choice(peopleSitting)
+                peopleSitting.remove(tableUser)
+                peopleInside.append(tableUser[0])
 
-        ran = np.random.uniform(0, len(peopleInStore))
-        while(ran > 0):
-            storeUser = random.choice(peopleInStore)
+                payload = {
+                    "tableID": str(tableUser[1]),
+                    "macAddress": str(tableUser[0][0]),
+                    "time": str(currentTime)
+                }
 
-            #Possible sale before getting out
-            pubSales(client, storeUser, currentTime)
+                client.publish("Sambil/Mesa/Parado", json.dumps(payload), qos=0)
+                print("Parado  (Mesa)   --> ", end='')
+                print(payload)
+                ran -= 1
 
-            peopleInStore.remove(storeUser)
-            peopleInside.append(storeUser[0])
+            ran = np.random.uniform(0, len(peopleInStore))
+            while(ran > 0):
+                storeUser = random.choice(peopleInStore)
 
-            payload = {
-                "beaconID": str(storeUser[1]),
-                "macAddress": str(storeUser[0][0]),
-                "time": str(currentTime)
-            }
+                #Possible sale before getting out
+                pubSales(client, storeUser, currentTime)
 
-            currentTime += datetime.timedelta(minutes=5)
+                peopleInStore.remove(storeUser)
+                peopleInside.append(storeUser[0])
 
-            if(storeUser[0] != "null"): #Beacons only detect users with smartphones
-                client.publish("Sambil/Tienda/Saliendo", json.dumps(payload), qos=0)
-            
-            print("Saliendo  (Tienda)   --> ", end='')
-            print(payload)
-            ran -= 1
-        
-        time.sleep(0.1)
+                payload = {
+                    "beaconID": str(storeUser[1]),
+                    "macAddress": str(storeUser[0][0]),
+                    "time": str(currentTime)
+                }
 
-    print("----------------End of the Simulation----------------")
+                currentTime += datetime.timedelta(minutes=5)
 
+                if(storeUser[0] != "null"): #Beacons only detect users with smartphones
+                    client.publish("Sambil/Tienda/Saliendo", json.dumps(payload), qos=0)
+                
+                print("Saliendo  (Tienda)   --> ", end='')
+                print(payload)
+                ran -= 1
+
+        print("----------------------------------------------------End of the Simulation------------------------------------------------------------------")
+        days -= 1
+        currentTime = datetime.timedelta(days=1) +  currentTime.replace(hour=8, minute=0)
+        print(currentTime,'fin del dia')
 
 
 #Publisher's Methods
@@ -288,7 +281,7 @@ def pubSales(client, buyer, currentTime):
             price = round(np.random.normal(avgPrice, stdPrice),2)
 
         
-        if(len(buyer[0] == 3)):
+        if(len(buyer[0])==3):
             correctData = False
             while(not correctData):
                 personData = random.choice(dataPeople)
@@ -335,23 +328,20 @@ def pubSales(client, buyer, currentTime):
             "price": str(price)
         }
 
-        if(buyer[0] != "null"):
+        if(buyer[0] != "null" and len(buyer[0]) ==3):
             counter = 0
             while(counter < len(knownPeople)):
                 if(buyer[0][0] == knownPeople[counter][0]):
-                    print("Modificando Known people")
                     knownPeople[counter].append(personID)
-                    knownPeople[counter].append(personData["first_name"])
-                    knownPeople[counter].append(personData["last_name"])
+                    knownPeople[counter].append(name)
+                    knownPeople[counter].append(lastname)
                     break
                 counter += 1
-            
-            print(knownPeople)
 
         print("Compra   (Tienda)   --> ", end='')
         print(payload)
 
-        client.publish("Sambil/Mesa/Compra", json.dumps(payload), qos=0)
+        client.publish("Sambil/Tienda/Compra", json.dumps(payload), qos=0)
 
 
 #Logical Funtions
@@ -372,6 +362,13 @@ def getNumVisits():
     stdEntries = 50
     return np.random.normal(avgEntries, stdEntries)
 
+def getJsonData():
+    with open('database.json') as json_file:  
+        data = json.load(json_file)
+        
+    return data['nombres']
+
+dataPeople = getJsonData()
 
 #Query Funtions
 def queryNumAccess():
@@ -384,8 +381,4 @@ def queryTableBeaconID():
     return [1,3,5,7,9,11,13,15]
 
 
-
-
 if __name__ == "__main__":
-    main()
-    sys.exit(0)
