@@ -7,6 +7,10 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish
 import numpy as np
 import datetime
+import psycopg2 as psy
+import pandas as pd
+
+conn=psy.connect(host = 'localhost', user= 'postgres', password ='12t09lma', dbname= 'SambilDB')
 
 knownPeople = []
 peopleInside = []
@@ -373,13 +377,36 @@ dataPeople = getJsonData()
 
 #Query Funtions
 def queryNumAccess():
-    return 3
+    sql='''SELECT *  
+    FROM public."camara";'''
+    df = pd.read_sql_query(sql, conn)
+    camaras = df.id.count()
+    print(camaras)
+    return camaras
+
 
 def queryStoreBeaconID():
-    return [1,3,5]
+    sql='''select b."id" from beacon as b
+    inner join tienda as t on t."fkbeacon"=b."id"'''
+    df = pd.read_sql_query(sql, conn)
+    Lista = []
+    for index, row in df.iterrows():
+        Lista.append(row["id"])
+    print(Lista)
+
+    return Lista
+    
 
 def queryTableBeaconID():
-    return [2,4,6]
+    sql='''select b."id" from beacon as b
+    inner join mesa as t on t."fkbeacon"=b."id"'''
+    df = pd.read_sql_query(sql, conn)
+    Lista = []
+    for index, row in df.iterrows():
+        Lista.append(row["id"])
+    print(Lista)
+
+    return Lista
 
 
 if __name__ == "__main__":
