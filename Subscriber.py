@@ -49,28 +49,84 @@ def on_message_C(client,userdata,message):
 
 
     
-def on_message_B(client,userdata,message):   
-    b = json.loads(message.payload)
+def on_message_M(client,userdata,message):   
+    m = json.loads(message.payload)
     print('------------------------------')
-    print("Beacon")
-    print('topic: %s' % message.topic)
-    print(b)
-    print('qos: %s' % message.qos)
+    if (message.topic=="Sambil/Mesa/Parado") :
+       if (m["macAddress"]!="null"):
+            print(m)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrom( mac, fkmesa, fecha, io)VALUES ( %s, %s, %s, %s);'''
+            cur.execute(sql, (m["macAddress"],m["tableID"], m["time"], False))
+            conn.commit()
+        else:
+            print(m)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrom(fkmesa, fecha, io)VALUES ( %s, %s, %s);'''
+            cur.execute(sql, (m["tableID"], m["time"],False))
+            conn.commit()
+    else:
+        if (m["macAddress"]!="null"):
+            print(m)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrom( mac, fkmesa, fecha, io)VALUES ( %s, %s, %s, %s);'''
+            cur.execute(sql, (m["macAddress"],m["tableID"], m["time"], True))
+            conn.commit()
+        else:
+            print(m)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrom(fkmesa, fecha, io)VALUES ( %s, %s, %s);'''
+            cur.execute(sql, (m["tableID"], m["time"],True))
+            conn.commit()
 
-def on_message_S(client,userdata,message):   
-    s = json.loads(message.payload)
-    print('------------------------------')
-    print("Sensor")
-    print('topic: %s' % message.topic)
-    print(s)
-    print('qos: %s' % message.qos)
+   
+def on_message_T(client,userdata,message): 
+    t = json.loads(message.payload)
+    print('------------------------------')  
+    if (message.topic=="Sambil/Tienda/Entrando") :
+        if (t["macAddress"]!="null"):
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrot(mac, fkbeacon, fecha, io)VALUES (%s, %s, %s, %s);'''
+            cur.execute(sql, (t["macAddress"],t["beaconID"], t["time"], True))
+            conn.commit()
+        else:
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrot(fkbeacon, fecha, io)VALUES ( %s, %s, %s);'''
+            cur.execute(sql, (t["beaconID"], t["time"], True))
+            conn.commit()
+    else if (message.topic=="Sambil/Tienda/Saliendo") :
+        if (t["macAddress"]!="null"):
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrot(mac, fkbeacon, fecha, io)VALUES (%s, %s, %s, %s);'''
+            cur.execute(sql, (t["macAddress"],t["beaconID"], t["time"], False))
+            conn.commit()
+        else:
+            print(t)
+            print('topic: %s' % message.topic)
+            cur = conn.cursor()
+            sql = '''INSERT INTO public.registrot(fkbeacon, fecha, io)VALUES ( %s, %s, %s);'''
+            cur.execute(sql, (t["beaconID"], t["time"], False))
+            conn.commit()
+    else:
+
+
 
 def main():	
     client = paho.mqtt.client.Client(client_id='Actividad Sambil',clean_session=False)
     client.on_connect = on_connect
     client.message_callback_add('Sambil/Camaras/#', on_message_C)
-    client.message_callback_add('Sambil/Beacons/#', on_message_B)
-    client.message_callback_add('Sambil/Sensors/#', on_message_S)
+    client.message_callback_add('Sambil/Mesa/#', on_message_M)
+    client.message_callback_add('Sambil/Tienda/#', on_message_T)
     client.connect(host='localhost') 
     client.loop_forever()
 
